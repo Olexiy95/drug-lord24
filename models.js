@@ -46,3 +46,10 @@ export const randomEvents = [
   { name: "Mugging", cashChange: -100, drugsChange: -1 },
   { name: "Casino Win", cashChange: 500, drugsChange: 0 },
 ];
+
+export const locations = [
+  { name: "New York", drugPrices: [100, 200, 300, 400] },
+  { name: "Los Angeles", drugPrices: [120, 220, 320, 420] },
+  { name: "Miami", drugPrices: [110, 210, 310, 410] },
+  { name: "Chicago", drugPrices: [130, 230, 330, 430] },
+];

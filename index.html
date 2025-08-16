@@ -23,9 +23,18 @@
         <div class="col-md-12">
           <div class="card" style="height: 225px !important">
             <div class="card-body">
-              <h5 class="card-title">Information</h5>
+              <h5 class="card-title text-center">Information</h5>
               <div class="card">
-                <div class="card-body"></div>
+                <div class="card-body" style="padding: 0 !important">
+                  <textarea
+                    rows="6"
+                    class="form-control"
+                    id="player-name"
+                    style="resize: none"
+                    disabled
+                    placeholder="Information about the flow of the game will go here"
+                  ></textarea>
+                </div>
               </div>
             </div>
           </div>
@@ -37,9 +46,6 @@
           <div class="card" style="height: 400px !important">
             <div class="card-body">
               <h5 class="card-title text-center">Market</h5>
-
-              <!-- List of Available Drugs -->
-
               <div class="col-md-12">
                 <div class="card">
                   <div class="drug-item-header">
@@ -66,11 +72,16 @@
                 <button class="btn btn-warning" id="sell-drugs" disabled>
                   << Sell
                 </button>
-                <button class="btn btn-secondary" id="pay-debt">
-                  Shopping
+                <button class="btn btn-info" id="pay-debt">Shopping</button>
+                <button class="btn btn-info" id="take-loan">Places</button>
+                <button
+                  class="btn btn-info"
+                  id="travel"
+                  data-bs-toggle="modal"
+                  data-bs-target="#travelMenuModal"
+                >
+                  Travel
                 </button>
-                <button class="btn btn-secondary" id="take-loan">Places</button>
-                <button class="btn btn-secondary" id="travel">Travel</button>
                 <button
                   type="button"
                   class="btn btn-primary"
@@ -97,8 +108,9 @@
                     <span class="drug-quantity-header">Quantity</span>
                     <span class="drug-price-header">Price</span>
                   </div>
+
                   <ul class="list-group" id="inventory">
-                    <li class="list-group-item"></li>
+                    <!-- Dynamically filled with drugs and quantities -->
                   </ul>
                 </div>
               </div>
@@ -119,6 +131,42 @@
     </div>
 
     <!-- Modal Structure To Use Later For Travel and Shopping? -->
+    <div
+      class="modal fade"
+      id="travelMenuModal"
+      tabindex="-1"
+      aria-labelledby="travelMenuModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="travelMenuModal">Travel Menu</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <!-- Modal content goes here -->
+            This is where you can add travel details or any other content.
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div
       class="modal fade"
       id="exampleModal"
