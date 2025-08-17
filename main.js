@@ -1,14 +1,34 @@
-import { drugsAvailable, playerRanks, randomEvents } from "./models.js";
+import { marketDrugs, playerRanks, randomEvents } from "./models.js";
+
+const SELL_BTN = document.getElementById("sell-drugs");
+const BUY_BTN = document.getElementById("buy-drugs");
+
+const INVENTORY_SELECTOR = document.getElementById("inventory");
+const MARKET_SELECTOR = document.getElementById("market");
+
+const BTN_SHOPPING = document.getElementById("btn-shopping");
+const BTN_PLACES = document.getElementById("btn-places");
+const BTN_FINANCES = document.getElementById("btn-finances");
+
+const BTN_TRAVEL = document.getElementById("btn-travel");
+const BTN_STAY = document.getElementById("btn-stay");
+
+const GAME_INFO_SELECTOR = document.getElementById("game-info");
+const DAY_COUNTER_SELECTOR = document.getElementById("day-counter");
+const LOCATION_INDICATOR_SELECTOR =
+  document.getElementById("location-indicator");
+
+let marketDrugSelected = null;
+let playerDrugSelected = null;
+
+let dayCounter = 1;
 
 // Initial game state
 
 let playerInventory = {
-  drugs: [
-    { name: "Weed", quantity: 0, basePrice: 100, selected: false },
-    { name: "Cocaine", quantity: 0, basePrice: 200, selected: false },
-    { name: "Heroin", quantity: 0, basePrice: 300, selected: false },
-    { name: "Meth", quantity: 0, basePrice: 400, selected: false },
-  ],
+  drugs: [],
+  items: [],
+  weapons: [],
 };
 
 let player = {
@@ -18,142 +38,163 @@ let player = {
   location: "New York",
 };
 
-let selectedDrug = null;
+const LOG_CONTENTS = ["Information about the game goes here..."];
 
-// List of available drugs and their prices
+GAME_INFO_SELECTOR.value = LOG_CONTENTS.join("\n");
 
 // Update UI elements
-function updateUI() {
+function updateUiState() {
   document.getElementById("cash").innerText = `$${player.cash}`;
   document.getElementById("debt").innerText = `$${player.debt}`;
-  document.getElementById("location").innerText = `${player.location}`;
 
-  document.getElementById("inventory").innerHTML = ""; // Clear existing inventory
-  player.inventory.drugs.forEach((drug) => {
-    const drugItem = document.createElement("li");
-    drugItem.role = "button";
-    drugItem.className = "list-group-item";
-    drugItem.innerHTML = `
-  <div class="drug-item">
-      <span class="drug-name">${drug.name}</span>
-      <span class="drug-quantity">${drug.quantity}</span>
-
-      <span class="drug-price">$${drug.basePrice}</span>
-      
-  </div>
-    `;
-    document.getElementById("inventory").appendChild(drugItem);
-    drugItem.addEventListener("click", () => {
-      player.drugs[drug].selected = !player.drugs[drug].selected;
-      selectedDrug = player.drugs[drug].selected ? player.drugs[drug] : null;
-      updateListStyles();
-      sellButton.disabled = !selectedDrug;
-    });
-  });
-
-  // Update drug list
-  // updateList();
-  initialiseDrugs("drug-list", drugsAvailable);
+  updateDrugState();
+  updateBuyButtonState();
+  DAY_COUNTER_SELECTOR.innerHTML = `Day ${dayCounter}`;
+  LOCATION_INDICATOR_SELECTOR.innerHTML = `${player.location}`;
 }
 
-const sellButton = document.getElementById("sell-drugs");
+// assumes INVENTORY_SELECTOR = document.getElementById("inventory"); // <tbody>
+// and MARKET_SELECTOR = document.getElementById("market");           // <tbody>
 
-const initialiseDrugs = (elementId, drugList) => {
-  const targetList = document.getElementById(elementId);
-  targetList.innerHTML = ""; // Clear existing items
+const updateDrugState = () => {
+  // Clear existing rows
+  INVENTORY_SELECTOR.innerHTML = "";
+  MARKET_SELECTOR.innerHTML = "";
 
-  drugList.forEach((drug) => {
-    const drugItem = document.createElement("li");
-    drugItem.role = "button";
-    drugItem.className = "list-group-item";
-    drugItem.innerHTML = `
-  <div class="drug-item">
-      <span class="drug-name">${drug.name}</span>
-      <span class="drug-quantity">${drug.quantity}</span>
-      <span class="drug-price">$${drug.basePrice}</span>
-  </div>
+  // MARKET TABLE ROWS
+  marketDrugs.forEach((drug, idx) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td class="drug-name">${drug.name}</td>
+      <td class="drug-quantity text-center">${drug.quantity}</td>
+      <td class="drug-price text-end">$${drug.basePrice}</td>
     `;
-    drugItem.style.backgroundColor = drug.selected ? "lightblue" : "white";
-    drugItem.addEventListener("click", () => {
-      drugClicked(drug, drugItem);
+    // reflect selected state on render
+    if (drug.selected) row.classList.add("selected");
+
+    row.addEventListener("click", () => {
+      drugClicked({ scope: "market", idx, drug }, row);
     });
-    targetList.appendChild(drugItem);
-  });
-};
 
-let updateList = () => {
-  console.log("updating list");
-  const drugList = document.getElementById("drug-list");
-  drugList.innerHTML = ""; // Clear existing items
-  drugsAvailable.forEach((drug) => {
-    const listItem = document.createElement("li");
-    listItem.role = "button";
-    listItem.className = "list-group-item";
-    listItem.innerHTML = `
-  <div class="drug-item">
-    <span class="drug-name">${drug.name}</span>
-    <span class="drug-quantity">${drug.quantity}</span>
-    <span class="drug-price">$${drug.basePrice}</span>
-  </div>
-`;
-    listItem.style.backgroundColor = drug.selected ? "lightblue" : "white";
-    listItem.addEventListener("click", () => {
-      drugClicked(drug, listItem);
+    MARKET_SELECTOR.appendChild(row);
+  });
+
+  // INVENTORY TABLE ROWS
+  player.inventory.drugs.forEach((invDrug, idx) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td class="drug-name">${invDrug.name}</td>
+      <td class="drug-quantity text-center">${invDrug.quantity}</td>
+    `;
+    // add a temporary flag for selection (separate from marketDrugs)
+    if (invDrug.selected) row.classList.add("selected");
+
+    row.addEventListener("click", () => {
+      drugClicked({ scope: "inventory", idx, drug: invDrug }, row);
     });
-    drugList.appendChild(listItem);
+
+    INVENTORY_SELECTOR.appendChild(row);
   });
-};
 
-let updateListStyles = () => {
-  const drugList = document.getElementById("drug-list");
-  drugList.childNodes.forEach((item, index) => {
-    item.style.backgroundColor = drugsAvailable[index].selected
-      ? "lightblue"
-      : "white";
-  });
-};
-
-let drugClicked = (drug, listItem) => {
-  drugsAvailable.forEach((d) => {
-    if (d !== drug) {
-      d.selected = false;
-    }
-  });
-  drug.selected = !drug.selected;
-
-  console.log("drug clicked", drug, listItem);
-  selectedDrug = drug.selected ? drug : null;
-
+  updateBuyButtonState();
   updateListStyles();
-  buyButton.disabled = !selectedDrug;
 };
 
-let buyButton = document.getElementById("buy-drugs");
+// highlight rows based on .selected flags
+const updateListStyles = () => {
+  // Market rows from marketDrugs.selected
+  const marketRows = MARKET_SELECTOR.querySelectorAll("tr");
+  marketRows.forEach((tr, i) => {
+    tr.classList.toggle("selected", !!marketDrugs[i]?.selected);
+  });
+
+  // Inventory rows from inventory item .selected
+  const invRows = INVENTORY_SELECTOR.querySelectorAll("tr");
+  invRows.forEach((tr, i) => {
+    tr.classList.toggle("selected", !!player.inventory.drugs[i]?.selected);
+  });
+};
+
+// handle clicks for both tables
+const drugClicked = ({ scope, idx, drug }, rowEl) => {
+  if (scope === "market") {
+    // deselect all other market items
+    marketDrugs.forEach(
+      (d, i) => (d.selected = i === idx ? !d.selected : false)
+    );
+    marketDrugSelected = marketDrugs[idx].selected ? drug : null;
+    // when selecting in market, clear inventory selection
+    player.inventory.drugs.forEach((d) => (d.selected = false));
+    playerDrugSelected = null;
+  } else {
+    // inventory selection (for selling, etc.)
+    player.inventory.drugs.forEach(
+      (d, i) => (d.selected = i === idx ? !d.selected : false)
+    );
+    playerDrugSelected = player.inventory.drugs[idx].selected ? drug : null;
+    // when selecting in inventory, clear market selection
+    marketDrugs.forEach((d) => (d.selected = false));
+    marketDrugSelected = null;
+  }
+
+  updateBuyButtonState();
+  updateListStyles();
+};
+
+// unchanged, but now tied to table rows
+const updateBuyButtonState = () => {
+  BUY_BTN.disabled =
+    !marketDrugSelected ||
+    player.cash < marketDrugSelected.basePrice ||
+    marketDrugSelected.quantity <= 0;
+};
+
+const drugTransaction = (drugName, cost, transactionType) => {
+  if (transactionType === "purchase") {
+    const drugExistsInInventory = player.inventory.drugs.find(
+      (d) => d.name === drugName
+    );
+
+    if (drugExistsInInventory) {
+      drugExistsInInventory.quantity += 1;
+      player.cash -= cost;
+
+      // initialiseDrugs("inventory", player.inventory.drugs);
+    } else {
+      const drugPayload = { name: drugName, quantity: 1 };
+      // console.log("Adding new drug to inventory", drugPayload);
+      player.inventory.drugs.push(drugPayload);
+      player.cash -= cost;
+
+      // console.log("New drug added to inventory", player.inventory);
+    }
+  } else if (transactionType === "sale") {
+    // console.log("Selling drug:", drugName);
+  }
+  updateUiState();
+};
 
 // Buy drugs
-buyButton.addEventListener("click", () => {
-  if (selectedDrug) {
-    console.log("selected drug", selectedDrug);
-    if (player.cash >= selectedDrug.basePrice) {
-      player.drugs[selectedDrug.name].quantity += 1;
-      player.cash -= selectedDrug.basePrice;
+BUY_BTN.addEventListener("click", () => {
+  if (marketDrugSelected) {
+    console.log("selected drug", marketDrugSelected);
+    if (player.cash >= marketDrugSelected.basePrice) {
+      marketDrugSelected.quantity -= 1; // Decrease the quantity of the drug available
 
-      updateUI();
+      drugTransaction(
+        marketDrugSelected.name,
+        marketDrugSelected.basePrice,
+        "purchase"
+      );
+      updateBuyButtonState();
     } else {
       alert("Not enough cash to buy drugs!");
     }
   }
-  // if (player.cash >= drugsAvailable[0].price) {
-  //   player.drugs += 1;
-  //   player.cash -= drugsAvailable[0].price;
-  //   updateUI();
-  // } else {
-  //   alert("Not enough cash to buy drugs!");
-  // }
 });
 
 // Sell drugs
-document.getElementById("sell-drugs").addEventListener("click", () => {
+SELL_BTN.addEventListener("click", () => {
   if (player.drugs > 0) {
     player.drugs -= 1;
     player.cash += 150; // selling for profit
@@ -163,19 +204,36 @@ document.getElementById("sell-drugs").addEventListener("click", () => {
   }
 });
 
+BTN_SHOPPING.addEventListener("click", () => {
+  console.log("Shopping button clicked");
+});
+
+BTN_PLACES.addEventListener("click", () => {
+  console.log("Places button clicked");
+});
+
+BTN_TRAVEL.addEventListener("click", () => {
+  console.log("Travel button clicked");
+});
+
+BTN_STAY.addEventListener("click", () => {
+  console.log("Stay Here button clicked");
+  advanceDay();
+});
+
+const advanceDay = () => {
+  console.log("Advancing to the next day");
+  dayCounter++;
+  DAY_COUNTER_SELECTOR.innerHTML = `Day ${dayCounter}`;
+  updateUiState();
+  if (dayCounter >= 50) {
+    BTN_STAY.disabled = true;
+    alert("Game Over");
+  }
+  // updateDayCounterUI();
+};
+
 console.log("player", player);
 
-// Travel to a new location
-// document.getElementById("travel").addEventListener("click", () => {
-//   let locations = ["New York", "Los Angeles", "Miami", "Chicago"];
-
-//   let currentLocationIndex = locations.indexOf(player.location);
-//   locations.splice(currentLocationIndex, 1);
-//   //   console.log(locations);
-
-//   player.location = locations[Math.floor(Math.random() * locations.length)];
-//   updateUI();
-// });
-
 // Initialize the game
-updateUI();
+updateUiState();

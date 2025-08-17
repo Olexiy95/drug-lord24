@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Druglord 2</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <div class="container mt-1">
+      <h2 class="text-center">Druglord 2 Clone</h2>
+
+      <!-- Info / Log -->
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card" style="height: 250px">
+            <div class="card-header bg-dark text-white">Game Log</div>
+            <div class="card-body p-2">
+              <textarea
+                class="form-control"
+                rows="7"
+                readonly
+                style="resize: none; pointer-events: none"
+                id="game-info"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Market -->
+        <div class="col-md-5 px-2">
+          <div class="card my-panel d-flex flex-column">
+            <div class="card-header bg-dark text-white text-center">Market</div>
+            <div class="card-body p-0 flex-grow-1">
+              <div class="table-container">
+                <table class="table table table-hover mb-0 sticky-header">
+                  <thead class="table-secondary">
+                    <tr>
+                      <th scope="col">Drug</th>
+                      <th scope="col" class="text-center">Quantity</th>
+                      <th scope="col" class="text-end">Price</th>
+                    </tr>
+                  </thead>
+                  <tbody id="market">
+                    <!-- Dynamically filled -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="col-md-2 px-2">
+          <div class="card my-panel d-flex flex-column">
+            <div class="card-header text-center bg-dark-subtle text-black">
+              <div id="day-counter" class="fw-bold"></div>
+              <div id="location-indicator" class="small"></div>
+            </div>
+
+            <div class="card-body">
+              <ul class="list-group gap-2">
+                <button
+                  class="btn btn-success"
+                  id="buy-drugs"
+                  title="Buy selected drug"
+                  disabled
+                >
+                  Buy >>
+                </button>
+                <button class="btn btn-warning" id="sell-drugs" disabled>
+                  << Sell
+                </button>
+                <button type="button" class="btn btn-primary" id="btn-stay">
+                  Stay Here
+                </button>
+                <button class="btn btn-info" id="btn-shopping">Shopping</button>
+                <button class="btn btn-info" id="btn-finances">Finances</button>
+
+                <button class="btn btn-info" id="btn-places">Places</button>
+                <button class="btn btn-info" id="btn-travel">Travel</button>
+                <a class="btn btn-danger" id="quit-game" href="index.html">
+                  Quit <i class="bi bi-box-arrow-right"></i>
+                </a>
+              </ul>
+            </div>
+
+            <div class="card-footer text-center bg-dark-subtle text-black">
+              <div>Cash: <span id="cash"></span></div>
+              <div>Debt: <span id="debt">$500</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inventory -->
+        <div class="col-md-5 px-2">
+          <div class="card my-panel d-flex flex-column">
+            <div class="card-header bg-dark text-white text-center">
+              Inventory
+            </div>
+            <div class="card-body p-0 flex-grow-1">
+              <div class="table-container">
+                <table class="table table table-hover mb-0 sticky-header">
+                  <thead class="table-secondary">
+                    <tr>
+                      <th scope="col">Drug</th>
+                      <th scope="col" class="text-center">Quantity</th>
+                    </tr>
+                  </thead>
+                  <tbody id="inventory">
+                    <!-- Dynamically filled -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Drug Details</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body"></div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS + Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>

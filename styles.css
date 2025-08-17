@@ -7,51 +7,29 @@ body {
   margin-bottom: 20px;
 }
 
-h1 {
-  color: #343a40;
+/* Panels */
+.my-panel {
+  height: 580px;
 }
 
-.list-group-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* Scrollable tables with sticky header */
+.table-container {
+  max-height: 500px; /* controls inner scroll area height */
+  overflow: auto;
 }
 
-.drug-item {
-  display: flex;
-  justify-content: space-between; /* Distributes space between elements */
-  align-items: center; /* Aligns elements vertically in the center */
-  width: 100%; /* Makes sure the item takes the full width of the container */
+.sticky-header thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1; /* keep header above rows */
 }
 
-.drug-name {
-  flex: 2; /* Gives more space to the drug name */
+/* Clickable rows for selection UX */
+#market tr,
+#inventory tr {
+  cursor: pointer;
 }
 
-.drug-quantity {
-  text-align: center;
-}
-.drug-price {
-  flex: 1; /* Equal space for quantity and price */
-  text-align: right; /* Aligns the text to the right */
-}
-
-.drug-item-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: bold; /* Makes the header bold */
-  padding: 10px 15px; /* Add some padding for better spacing */
-  background-color: #e9ecef; /* Light grey background */
-  border-bottom: 2px solid #dee2e6; /* Border below to distinguish it */
-}
-
-.drug-name-header {
-  flex: 2;
-}
-
-.drug-quantity-header,
-.drug-price-header {
-  flex: 1;
-  text-align: right;
+.table tbody tr.selected > * {
+  background-color: rgba(13, 110, 253, 0.2) !important; /* primary-ish */
 }
